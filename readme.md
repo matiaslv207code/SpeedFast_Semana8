@@ -87,4 +87,5 @@ git clone https://github.com/matiaslv207code/SpeedFast_Semana8.git
 **Repositorio GitHub**: https://github.com/matiaslv207code/SpeedFast_Semana8
 **Fecha de entrega**: [05/10/2026]
 
+---
 © Duoc UC | Escuela de Informática y Telecomunicaciones | Desarrollo Orientado a Objetos II
