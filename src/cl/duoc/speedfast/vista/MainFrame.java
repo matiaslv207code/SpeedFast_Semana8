@@ -14,15 +14,18 @@ import java.util.List;
 
 public class MainFrame extends JFrame {
 
+    // instancias de los objetos dao para interactuar con la base de datos
     private RepartidorDAO repartidorDAO = new RepartidorDAO();
     private PedidoDAO pedidoDAO = new PedidoDAO();
     private EntregaDAO entregaDAO = new EntregaDAO();
 
+    // componentes para la pestana de repartidores
     private JTextField txtNombreRepartidor;
     private JTable tablaRepartidores;
     private DefaultTableModel modeloRepartidores;
     private int idRepartidorSeleccionado = -1;
 
+    // componentes para la pestana de pedidos
     private JTextField txtDireccionPedido;
     private JComboBox<String> cmbTipoPedido;
     private JComboBox<String> cmbEstadoPedido;
@@ -30,6 +33,7 @@ public class MainFrame extends JFrame {
     private DefaultTableModel modeloPedidos;
     private int idPedidoSeleccionado = -1;
 
+    // componentes para la pestana de entregas
     private JComboBox<Repartidor> cmbRepartidorEntrega;
     private JComboBox<Pedido> cmbPedidoEntrega;
     private JTextField txtFechaEntrega;
@@ -38,12 +42,14 @@ public class MainFrame extends JFrame {
     private DefaultTableModel modeloEntregas;
     private int idEntregaSeleccionada = -1;
 
+    // constructor principal para inicializar la interfaz grafica y sus pestanas
     public MainFrame() {
-        setTitle("SpeedFast - Sistema de Gestión Integral");
+        setTitle("SpeedFast - Sistema de Gestion Integral");
         setSize(1200, 750);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
+        // creacion del panel de pestanas para organizar los modulos
         JTabbedPane tabbedPane = new JTabbedPane();
         tabbedPane.add("Repartidores", crearPanelRepartidores());
         tabbedPane.add("Pedidos", crearPanelPedidos());
@@ -51,11 +57,13 @@ public class MainFrame extends JFrame {
 
         add(tabbedPane);
 
+        // carga inicial de datos desde la base de datos hacia las tablas y combobox
         actualizarDatosRepartidores();
         actualizarDatosPedidos();
         actualizarDatosEntregas();
     }
 
+    // metodo que construye y configura el panel visual de repartidores
     private JPanel crearPanelRepartidores() {
         JPanel panel = new JPanel(new BorderLayout());
         JPanel form = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -78,6 +86,7 @@ public class MainFrame extends JFrame {
         tablaRepartidores = new JTable(modeloRepartidores);
         panel.add(new JScrollPane(tablaRepartidores), BorderLayout.CENTER);
 
+        // evento para detectar la seleccion de una fila en la tabla de repartidores
         tablaRepartidores.getSelectionModel().addListSelectionListener(e -> {
             int fila = tablaRepartidores.getSelectedRow();
             if (fila >= 0) {
@@ -86,14 +95,15 @@ public class MainFrame extends JFrame {
             }
         });
 
+        // accion para guardar un nuevo repartidor
         btnGuardar.addActionListener(e -> {
             if (txtNombreRepartidor.getText().trim().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "El nombre no puede estar vacío.", "Validación", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "El nombre no puede estar vacio.", "Validacion", JOptionPane.WARNING_MESSAGE);
                 return;
             }
             Repartidor r = new Repartidor(txtNombreRepartidor.getText().trim());
             if (repartidorDAO.create(r)) {
-                JOptionPane.showMessageDialog(this, "Repartidor registrado con éxito.");
+                JOptionPane.showMessageDialog(this, "Repartidor registrado con exito.");
                 actualizarDatosRepartidores();
                 limpiarRepartidor();
             } else {
@@ -101,6 +111,7 @@ public class MainFrame extends JFrame {
             }
         });
 
+        // accion para actualizar un repartidor existente
         btnActualizar.addActionListener(e -> {
             if (idRepartidorSeleccionado == -1) {
                 JOptionPane.showMessageDialog(this, "Seleccione un repartidor de la tabla.", "Aviso", JOptionPane.WARNING_MESSAGE);
@@ -108,7 +119,7 @@ public class MainFrame extends JFrame {
             }
             Repartidor r = new Repartidor(idRepartidorSeleccionado, txtNombreRepartidor.getText().trim());
             if (repartidorDAO.update(r)) {
-                JOptionPane.showMessageDialog(this, "Repartidor actualizado con éxito.");
+                JOptionPane.showMessageDialog(this, "Repartidor actualizado con exito.");
                 actualizarDatosRepartidores();
                 limpiarRepartidor();
             } else {
@@ -116,12 +127,13 @@ public class MainFrame extends JFrame {
             }
         });
 
+        // accion para eliminar un repartidor seleccionado
         btnEliminar.addActionListener(e -> {
             if (idRepartidorSeleccionado == -1) {
                 JOptionPane.showMessageDialog(this, "Seleccione un repartidor de la tabla.", "Aviso", JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            int confirmar = JOptionPane.showConfirmDialog(this, "¿Está seguro de eliminar?", "Confirmar", JOptionPane.YES_NO_OPTION);
+            int confirmar = JOptionPane.showConfirmDialog(this, "Esta seguro de eliminar?", "Confirmar", JOptionPane.YES_NO_OPTION);
             if (confirmar == JOptionPane.YES_OPTION) {
                 if (repartidorDAO.delete(idRepartidorSeleccionado)) {
                     JOptionPane.showMessageDialog(this, "Repartidor eliminado.");
@@ -137,6 +149,7 @@ public class MainFrame extends JFrame {
         return panel;
     }
 
+    // metodo para refrescar los datos de la tabla y combobox de repartidores
     private void actualizarDatosRepartidores() {
         modeloRepartidores.setRowCount(0);
         List<Repartidor> lista = repartidorDAO.readAll();
@@ -157,10 +170,11 @@ public class MainFrame extends JFrame {
         tablaRepartidores.clearSelection();
     }
 
+    // metodo que construye y configura el panel visual de pedidos
     private JPanel crearPanelPedidos() {
         JPanel panel = new JPanel(new BorderLayout());
         JPanel form = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        form.add(new JLabel("Dirección:"));
+        form.add(new JLabel("Direccion:"));
         txtDireccionPedido = new JTextField(12);
         form.add(txtDireccionPedido);
 
@@ -183,10 +197,11 @@ public class MainFrame extends JFrame {
         form.add(btnLimpiar);
         panel.add(form, BorderLayout.NORTH);
 
-        modeloPedidos = new DefaultTableModel(new String[]{"ID", "Dirección", "Tipo", "Estado"}, 0);
+        modeloPedidos = new DefaultTableModel(new String[]{"ID", "Direccion", "Tipo", "Estado"}, 0);
         tablaPedidos = new JTable(modeloPedidos);
         panel.add(new JScrollPane(tablaPedidos), BorderLayout.CENTER);
 
+        // evento para cargar los datos del pedido seleccionado en los campos del formulario
         tablaPedidos.getSelectionModel().addListSelectionListener(e -> {
             int fila = tablaPedidos.getSelectedRow();
             if (fila >= 0) {
@@ -197,14 +212,15 @@ public class MainFrame extends JFrame {
             }
         });
 
+        // accion para registrar un nuevo pedido
         btnGuardar.addActionListener(e -> {
             if (txtDireccionPedido.getText().trim().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "La dirección es obligatoria.", "Validación", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "La direccion es obligatoria.", "Validacion", JOptionPane.WARNING_MESSAGE);
                 return;
             }
             Pedido p = new Pedido(txtDireccionPedido.getText().trim(), cmbTipoPedido.getSelectedItem().toString(), cmbEstadoPedido.getSelectedItem().toString());
             if (pedidoDAO.create(p)) {
-                JOptionPane.showMessageDialog(this, "Pedido registrado con éxito.");
+                JOptionPane.showMessageDialog(this, "Pedido registrado con exito.");
                 actualizarDatosPedidos();
                 limpiarPedido();
             } else {
@@ -212,6 +228,7 @@ public class MainFrame extends JFrame {
             }
         });
 
+        // accion para actualizar un pedido existente
         btnActualizar.addActionListener(e -> {
             if (idPedidoSeleccionado == -1) {
                 JOptionPane.showMessageDialog(this, "Seleccione un pedido de la tabla.", "Aviso", JOptionPane.WARNING_MESSAGE);
@@ -219,7 +236,7 @@ public class MainFrame extends JFrame {
             }
             Pedido p = new Pedido(idPedidoSeleccionado, txtDireccionPedido.getText().trim(), cmbTipoPedido.getSelectedItem().toString(), cmbEstadoPedido.getSelectedItem().toString());
             if (pedidoDAO.update(p)) {
-                JOptionPane.showMessageDialog(this, "Pedido actualizado con éxito.");
+                JOptionPane.showMessageDialog(this, "Pedido actualizado con exito.");
                 actualizarDatosPedidos();
                 limpiarPedido();
             } else {
@@ -227,12 +244,13 @@ public class MainFrame extends JFrame {
             }
         });
 
+        // accion para eliminar un pedido seleccionado
         btnEliminar.addActionListener(e -> {
             if (idPedidoSeleccionado == -1) {
                 JOptionPane.showMessageDialog(this, "Seleccione un pedido de la tabla.", "Aviso", JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            int confirmar = JOptionPane.showConfirmDialog(this, "¿Está seguro de eliminar este pedido?", "Confirmar", JOptionPane.YES_NO_OPTION);
+            int confirmar = JOptionPane.showConfirmDialog(this, "Esta seguro de eliminar este pedido?", "Confirmar", JOptionPane.YES_NO_OPTION);
             if (confirmar == JOptionPane.YES_OPTION) {
                 if (pedidoDAO.delete(idPedidoSeleccionado)) {
                     JOptionPane.showMessageDialog(this, "Pedido eliminado.");
@@ -248,6 +266,7 @@ public class MainFrame extends JFrame {
         return panel;
     }
 
+    // metodo para refrescar la tabla y el combobox de pedidos
     private void actualizarDatosPedidos() {
         modeloPedidos.setRowCount(0);
         List<Pedido> lista = pedidoDAO.readAll();
@@ -270,6 +289,7 @@ public class MainFrame extends JFrame {
         tablaPedidos.clearSelection();
     }
 
+    // metodo que construye y configura el panel visual de entregas y relaciones
     private JPanel crearPanelEntregas() {
         JPanel panel = new JPanel(new BorderLayout());
         JPanel form = new JPanel(new FlowLayout(FlowLayout.LEFT));
@@ -304,6 +324,7 @@ public class MainFrame extends JFrame {
         tablaEntregas = new JTable(modeloEntregas);
         panel.add(new JScrollPane(tablaEntregas), BorderLayout.CENTER);
 
+        // evento para recuperar los datos de la entrega seleccionada en la tabla
         tablaEntregas.getSelectionModel().addListSelectionListener(e -> {
             int fila = tablaEntregas.getSelectedRow();
             if (fila >= 0) {
@@ -313,13 +334,14 @@ public class MainFrame extends JFrame {
             }
         });
 
+        // accion para registrar una nueva entrega vinculando pedido y repartidor
         btnGuardar.addActionListener(e -> {
             if (cmbPedidoEntrega.getSelectedItem() == null || cmbRepartidorEntrega.getSelectedItem() == null) {
-                JOptionPane.showMessageDialog(this, "Debe seleccionar un pedido y un repartidor.", "Validación", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "Debe seleccionar un pedido y un repartidor.", "Validacion", JOptionPane.WARNING_MESSAGE);
                 return;
             }
             if (txtFechaEntrega.getText().trim().isEmpty() || txtHoraEntrega.getText().trim().isEmpty()) {
-                JOptionPane.showMessageDialog(this, "La fecha y hora son obligatorias.", "Validación", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(this, "La fecha y hora son obligatorias.", "Validacion", JOptionPane.WARNING_MESSAGE);
                 return;
             }
             Pedido pedidoSel = (Pedido) cmbPedidoEntrega.getSelectedItem();
@@ -328,7 +350,7 @@ public class MainFrame extends JFrame {
             Entrega ent = new Entrega(pedidoSel.getId(), repSel.getId(), txtFechaEntrega.getText().trim(), txtHoraEntrega.getText().trim());
 
             if (entregaDAO.create(ent)) {
-                JOptionPane.showMessageDialog(this, "Entrega registrada con éxito.");
+                JOptionPane.showMessageDialog(this, "Entrega registrada con exito.");
                 actualizarDatosEntregas();
                 limpiarEntrega();
             } else {
@@ -336,6 +358,7 @@ public class MainFrame extends JFrame {
             }
         });
 
+        // accion para actualizar una entrega existente
         btnActualizar.addActionListener(e -> {
             if (idEntregaSeleccionada == -1) {
                 JOptionPane.showMessageDialog(this, "Seleccione una entrega de la tabla.", "Aviso", JOptionPane.WARNING_MESSAGE);
@@ -347,7 +370,7 @@ public class MainFrame extends JFrame {
             Entrega ent = new Entrega(idEntregaSeleccionada, pedidoSel.getId(), repSel.getId(), txtFechaEntrega.getText().trim(), txtHoraEntrega.getText().trim());
 
             if (entregaDAO.update(ent)) {
-                JOptionPane.showMessageDialog(this, "Entrega actualizada con éxito.");
+                JOptionPane.showMessageDialog(this, "Entrega actualizada con exito.");
                 actualizarDatosEntregas();
                 limpiarEntrega();
             } else {
@@ -355,12 +378,13 @@ public class MainFrame extends JFrame {
             }
         });
 
+        // accion para eliminar una entrega seleccionada
         btnEliminar.addActionListener(e -> {
             if (idEntregaSeleccionada == -1) {
                 JOptionPane.showMessageDialog(this, "Seleccione una entrega de la tabla.", "Aviso", JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            int confirmar = JOptionPane.showConfirmDialog(this, "¿Está seguro de eliminar esta entrega?", "Confirmar", JOptionPane.YES_NO_OPTION);
+            int confirmar = JOptionPane.showConfirmDialog(this, "Esta seguro de eliminar esta entrega?", "Confirmar", JOptionPane.YES_NO_OPTION);
             if (confirmar == JOptionPane.YES_OPTION) {
                 if (entregaDAO.delete(idEntregaSeleccionada)) {
                     JOptionPane.showMessageDialog(this, "Entrega eliminada.");
@@ -376,6 +400,7 @@ public class MainFrame extends JFrame {
         return panel;
     }
 
+    // metodo para refrescar los datos de la tabla de entregas
     private void actualizarDatosEntregas() {
         modeloEntregas.setRowCount(0);
         List<Entrega> lista = entregaDAO.readAll();
@@ -391,6 +416,7 @@ public class MainFrame extends JFrame {
         tablaEntregas.clearSelection();
     }
 
+    // punto de entrada principal de la aplicacion de escritorio
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new MainFrame().setVisible(true));
     }
